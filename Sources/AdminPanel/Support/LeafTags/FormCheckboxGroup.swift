@@ -4,14 +4,18 @@ import Node
 import Vapor
 import VaporForms
 
-public class FormNumberGroup: BasicTag {
+public enum Error: Swift.Error {
+    case parse
+}
+
+public class FormCheckboxGroup: BasicTag {
     public init(){}
-    public let name = "form:numbergroup"
+    public let name = "form:checkboxgroup"
     
     public func run(arguments: [Argument]) throws -> Node? {
         
         /*
-         #form:numbergroup(key, value, fieldset)
+         #form:checkboxgroup(key, value, fieldset)
          
          Arguments:
          [0] = The name of the input (the key that gets posted) *
@@ -23,63 +27,61 @@ public class FormNumberGroup: BasicTag {
          
          The <label> will get its value from the Fieldset
          
-         If the Fieldset has the "errors" property the form-group will get the has-error css class and all errors will be added as help-block's to the form-group
+         Checkboxes currently does not support validation
          
          given input:
          
          let fieldset = Fieldset([
-            "age": IntegerField(
-                label: "Your Age",
-                Int.MinimumValidator(value: 1),
-                Int.MaximumValidator(value: 110)
+            "sendMail": StringField(
+                label: "Send Welcome Mail to User"
             )
-         ], requiring: ["age"])
+         ])
          
-         #form:numbergroup("age", 10, fieldset)
+         #form:checkboxgroup("sendMail", false, fieldset)
          
-         expected output if fieldset is valid:
-         <div class="form-group">
-            <label class="control-label" for="age">Your Age</label>
-            <input class="form-control" type="number" id="age" name="age" value="10" />
+         expected output if value is true:
+         <div class="checkbox">
+            <label>
+                <input type="checkbox" name="sendMail" value="true" checked>
+                Send Welcome Mail to User
+            </label>
+        </div>
+         
+         expected output if fieldset is false:
+         <div class="checkbox">
+            <label>
+                <input type="checkbox" name="sendMail" value="false">
+                Send Welcome Mail to User
+            </label>
          </div>
-         
-         expected output if fieldset is invalid:
-         <div class="form-group has-error">
-            <label class="control-label" for="age">Your Age</label>
-            <input class="form-control" type="number" id="age" name="age" value="10" />
-            <span class="help-block">...validation message N</span>
-         </div>
-         */
+        */
         
-        
+
         guard arguments.count == 3,
             let inputName: String = arguments[0].value?.string,
             let fieldsetNode = arguments[2].value?.nodeObject
-            else {
-                throw Error.parse
+        else {
+            throw Error.parse
         }
         
-        // TODO: Parse the type of value...
         let inputValue = ""
-        print(type(of: arguments[1].value?.node))
-        print(type(of: arguments[1].value?.nodeObject))
         
         let fieldset = fieldsetNode[inputName]
         
         let label = fieldset?["label"]?.string ?? inputName
         
         // This is not a required property
-        let errors = fieldset?["errors"]?.pathIndexableArray
+        //let errors = fieldset?["errors"]?.pathIndexableArray
         
         // Start constructing the template
         var template = [String]()
-        
+
         template.append("<div class='form-group \(errors != nil ? "has-error" : "")'>")
         
         template.append("<label class='control-label' for='\(inputName)'>\(label)</label>")
         
-        template.append("<input class='form-control' type='number' id='\(inputName)' name='\(inputName)' value='\(inputValue)' />")
-        
+        template.append("<input class='form-control' type='text' id='\(inputName)' name='\(inputName)' value='\(inputValue)' />")
+      
         // If Fieldset has errors then loop through them and add help-blocks
         if(errors != nil) {
             for e in errors! {

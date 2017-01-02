@@ -65,7 +65,9 @@ public final class BackendUsersController {
             "roles": BackendUserRole.all().makeNode(),
             "fieldset": UserForm.fieldset,
             "foo": 21,
-            "bar": 21.3436
+            "bar": Float(21.3436),
+            "baz": false,
+            "one": true
         ], for: request)
     }
     
