@@ -65,12 +65,11 @@ public final class BackendUserResetPasswordTokens: Model {
     public static func prepare(_ database: Database) throws {
         try database.create("backend_reset_password_tokens") { table in
             table.id()
-            table.string("email", length: 191, unique: true)
-            table.string("token", length: 191)
-            table.string("used_at", optional: true)
-            table.string("expire_at", optional: true)
-            table.string("created_at", optional: false)
-            table.string("updated_at", optional: false)
+            table.varchar("email", length: 191, unique: true)
+            table.varchar("token", length: 191)
+            table.datetime("used_at", optional: true)
+            table.datetime("expire_at", optional: true)
+            table.timestamps()
         }
         
         try? database.index(table: "backend_reset_password_tokens", column: "email")
